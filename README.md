@@ -75,19 +75,24 @@ python -m pytest tests/ -v
 ---
 
 ## 🗂️ Project structure
-
 ```
-pawpal_system.py   ← backend logic (Owner, Pet, Task, Scheduler)
-app.py             ← Streamlit UI
-main.py            ← CLI demo script
-tests/
-  test_pawpal.py   ← 17 automated tests
-uml_final.png      ← final UML class diagram
-reflection.md      ← design and AI collaboration reflection
-requirements.txt
+pawpal-starter/
+├── pawpal_system.py       ← backend logic (Owner, Pet, Task, Scheduler)
+├── app.py                 ← Streamlit UI
+├── main.py                ← CLI demo script
+├── uml_final.png          ← final UML class diagram
+├── uml_draft.md           ← initial UML draft (Phase 1)
+├── reflection.md          ← design and AI collaboration reflection
+├── README.md              
+├── requirements.txt       
+├── screenshot_setup.png   ← app screenshot: owner & pet setup
+├── screenshot_schedule.png← app screenshot: generated schedule
+├── screenshot_filters.png ← app screenshot: task filters
+├── screenshot_tests.png   ← terminal screenshot: 17 passing tests
+└── tests/
+    ├── __init__.py        ← empty, marks folder as test package
+    └── test_pawpal.py     ← 17 automated tests
 ```
-
----
 
 ## 📸 Demo
 
