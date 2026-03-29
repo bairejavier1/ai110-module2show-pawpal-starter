@@ -59,10 +59,11 @@ python main.py
 ---
 
 ## 🧪 Testing PawPal+
-
 ```bash
 python -m pytest tests/ -v
 ```
+
+![Tests](screenshot_tests.png)
 
 **17 tests** covering:
 
