@@ -4,13 +4,20 @@
 
 **a. Initial design**
 
-- Briefly describe your initial UML design.
-- What classes did you include, and what responsibilities did you assign to each?
+I designed four classes:
+
+- **Task** — holds title, time (HH:MM), duration, priority, frequency, completion status, and due date. Can mark itself complete and generate its next occurrence using Python's `timedelta`.
+- **Pet** — stores name, species, and a list of Tasks. Exposes `add_task()` and `get_tasks()`.
+- **Owner** — holds a list of Pets and returns all tasks across them as `(pet_name, task)` tuples via `get_all_tasks()`.
+- **Scheduler** — the brain. Accepts an Owner and handles sorting, filtering, conflict detection, and recurring task logic.
+
+Three core user actions: add a pet with tasks, view today's sorted schedule with conflict warnings, mark a task complete and have it auto-reschedule.
 
 **b. Design changes**
 
-- Did your design change during implementation?
-- If yes, describe at least one change and why you made it.
+Two changes from my initial draft:
+1. Added `due_date` to `Task` — required for `timedelta` recurrence logic to work.
+2. Split a generic `get_schedule()` into `filter_by_pet()` and `filter_by_status()` after realizing owners need targeted views, not just a full task dump.
 
 ---
 
@@ -18,13 +25,11 @@
 
 **a. Constraints and priorities**
 
-- What constraints does your scheduler consider (for example: time, priority, preferences)?
-- How did you decide which constraints mattered most?
+The scheduler considers time (chronological sort), priority (low/medium/high label), and frequency (once/daily/weekly with auto-reschedule). Time-based sorting took priority because a pet owner's main need is knowing what to do next throughout the day.
 
 **b. Tradeoffs**
 
-- Describe one tradeoff your scheduler makes.
-- Why is that tradeoff reasonable for this scenario?
+Conflict detection only flags tasks at the exact same start time. It does not catch overlapping durations — a 60-min task at 09:00 and a 20-min task at 09:30 would overlap but not be flagged. This is a reasonable first-version tradeoff: exact-time matching covers the most obvious mistakes without requiring complex interval comparison logic.
 
 ---
 
@@ -32,13 +37,16 @@
 
 **a. How you used AI**
 
-- How did you use AI tools during this project (for example: design brainstorming, debugging, refactoring)?
-- What kinds of prompts or questions were most helpful?
+- **Design** — generated the Mermaid.js UML diagram from my class descriptions.
+- **Scaffolding** — used Agent Mode to produce class skeletons, then filled in logic incrementally.
+- **Tests** — used `#codebase` to draft an initial test plan, then extended it with edge cases manually.
+- **UI** — asked Copilot to explain `st.session_state` for data persistence across Streamlit reruns.
+
+Most effective prompts were specific and file-referenced, e.g. *"Based on #file:pawpal_system.py, how should Scheduler retrieve tasks from Owner's pets?"*
 
 **b. Judgment and verification**
 
-- Describe one moment where you did not accept an AI suggestion as-is.
-- How did you evaluate or verify what the AI suggested?
+When Copilot suggested raising an `Exception` on conflict detection I rejected it — a crash is not useful to a pet owner. I changed it to collect warning strings and return a list instead, then verified by running `main.py` with two tasks at "09:00". I also rejected storing tasks as plain dictionaries inside `Pet` because it would have broken the OOP design and made Scheduler methods harder to write cleanly.
 
 ---
 
@@ -46,13 +54,14 @@
 
 **a. What you tested**
 
-- What behaviors did you test?
-- Why were these tests important?
+17 tests across two batches:
+
+- **Core (8):** task completion, task count, sort order, daily recurrence, conflict detection, no false conflicts, pet filter, status filter.
+- **Edge cases (9):** pet with no tasks, scheduler with empty pet, owner with no pets, scheduler with no pets, weekly task crossing month boundary, "once" task not recurring, marking "once" complete adds no new task, marking nonexistent task doesn't crash, case-insensitive pet name filter.
 
 **b. Confidence**
 
-- How confident are you that your scheduler works correctly?
-- What edge cases would you test next if you had more time?
+⭐⭐⭐⭐⭐ (5/5) — All 17 tests pass in 0.04s, covering both happy paths and edge cases. Next tests I'd add: duration-aware overlap detection and Streamlit session state persistence verification.
 
 ---
 
@@ -60,12 +69,13 @@
 
 **a. What went well**
 
-- What part of this project are you most satisfied with?
+The recurring task logic. Splitting responsibility between `Task.next_occurrence()` (calculates the date) and `Scheduler.mark_task_complete()` (decides whether to call it) kept each method small, focused, and independently testable.
 
 **b. What you would improve**
 
-- If you had another iteration, what would you improve or redesign?
+1. Duration-aware conflict detection to catch overlapping windows, not just exact start-time matches.
+2. JSON persistence via `save_to_json()` / `load_from_json()` on `Owner` so data survives between sessions.
 
 **c. Key takeaway**
 
-- What is one important thing you learned about designing systems or working with AI on this project?
+AI is most powerful as a scaffolding tool, not a decision-maker. Copilot accelerated the implementation, but the design decisions — rejecting a crashing conflict detector, keeping `Task` as a dataclass instead of a dictionary — were mine to make. The quality of the system came from the architecture, not from accepting the first AI output.
